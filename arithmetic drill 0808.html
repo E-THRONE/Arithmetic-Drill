@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arithmetic Drill(四則演算練習ツール)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 600px; /* Limit width for larger screens */
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .exit-button {
+            background-color: #dc3545;
+        }
+        .submit-button {
+            background-color: #28a745;
+        }
+        .start-button {
+            background-color: #007bff;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        p {
+            font-size: 18px;
+        }
+        @media (max-width: 600px) {
+            .button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            input[type="text"] {
+                font-size: 14px;
+            }
+            p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-screen" class="container">
+    <h1>Arithmetic Drill(四則演算)</h1>
+    <p>Click below to start practicing arithmetic problems.(スタートボタンを押して、四則演算の練習を始めましょう。)</p>
+    <button class="button start-button" onclick="showProblemScreen()">Start(はじめる)</button>
+</div>
+
+<div id="problem-screen" class="container hidden">
+    <h1>Answer the question below. (次の問題に答えてください。)</h1>
+    <p id="question">The question will appear here</p>
+    <input type="text" id="answer" placeholder="Enter your answer">
+    <button class="button submit-button" onclick="checkAnswer()">Submit Answer(答える)</button>
+    <button class="button exit-button" onclick="showStartScreen()">Exit(やめる)</button>
+    <p id="result"></p>
+    <p>Problems Solved(問題数): <span id="problem-count">0</span></p>
+    <p>Correct Answers(正答数): <span id="correct-count">0</span></p>
+</div>
+
+<script>
+    let num1, num2, operator, correctAnswer;
+    let problemCount = 0;
+    let correctCount = 0;
+    let currentOperatorIndex = 0;
+
+    // Operators in the order of addition, subtraction, multiplication, division
+    const operators = ['+', '-', '×', '÷'];
+
+   function generateQuestion() {
+    let validQuestion = false;
+
+    while (!validQuestion) {
+        num1 = Math.floor(Math.random() * 50) + 1; // Generate numbers from 1 to 50
+        num2 = Math.floor(Math.random() * 50) + 1; // Generate numbers from 1 to 50
+        operator = operators[currentOperatorIndex];
+
+        if (operator === '+') {
+            correctAnswer = num1 + num2;
+            validQuestion = true;
+        } else if (operator === '-') {
+            if (num1 >= num2) {
+                correctAnswer = num1 - num2;
+                validQuestion = true;
+            }
+        } else if (operator === '×') {
+            // Ensure num1 and num2 are both greater than 1
+            if (num1 > 1 && num2 > 1 && num1 * num2 <= 500) {
+                correctAnswer = num1 * num2;
+                validQuestion = true;
+            }
+        } else if (operator === '÷') {
+            // Ensure num2 is not 1 and num1 is divisible by num2 and result is not 1
+            if (num2 > 1 && num1 % num2 === 0 && num1 / num2 > 1) {
+                correctAnswer = num1 / num2;
+                validQuestion = true;
+            }
+        }
+    }
+
+    document.getElementById('question').innerText = `${num1} ${operator} ${num2} = ?`;
+}
+
+    function checkAnswer() {
+        const userAnswer = parseFloat(document.getElementById('answer').value);
+        const resultElement = document.getElementById('result');
+
+        problemCount++;
+        document.getElementById('problem-count').innerText = problemCount;
+
+        if (userAnswer === correctAnswer) {
+            correctCount++;
+            resultElement.innerText = 'Correct!(正解です!)';
+            resultElement.style.color = '#28a745'; // Green for correct answer
+        } else {
+            resultElement.innerText = 'Incorrect.(おしい!)';
+            resultElement.style.color = '#dc3545'; // Red for incorrect answer
+        }
+
+        document.getElementById('correct-count').innerText = correctCount;
+        document.getElementById('answer').value = '';
+
+        // Update operator index to cycle through the operators
+        currentOperatorIndex = (currentOperatorIndex + 1) % operators.length;
+        generateQuestion();
+    }
+
+    function showProblemScreen() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('problem-screen').classList.remove('hidden');
+        generateQuestion();
+    }
+
+    function showStartScreen() {
+        document.getElementById('problem-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
